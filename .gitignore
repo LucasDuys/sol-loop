@@ -3,4 +3,4 @@
 *.log
 __pycache__/
 logs/
-evals/external/runs/*/work/repo/
+**/work/repo/
