@@ -1,0 +1,5 @@
+{
+  "executor_input": "evals/external/runs/swe-4-baseline/pytest-dev__pytest-7571/BRIEF.md",
+  "prompt": "implement directly from issue, no SPEC",
+  "check": "official harness"
+}

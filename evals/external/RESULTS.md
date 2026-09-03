@@ -47,3 +47,18 @@ pass 1/6
 | smoke-1-solonly (sol-only) | 1/1 (5 invalid: rate limited) | 29.3 | 12.21 | 122.9 |
 
 Wall time covers the Sol side only. Executor time is recorded by hand in this environment. Sol units ride the 20 EUR subscription at 0 EUR marginal, so the saving vs Sol-only is rate limit and latency, not euros. Euro savings apply against metered API models, see PUBLISHED.md.
+
+## SWE-bench Verified starter slice 2026-09-03
+
+Four real instances, two repos, both arms executed by hand from first principles (no upstream patch peeking). Official Docker grading where the hub serves this machine.
+
+| Instance | sol-loop arm | muse-only baseline | Patches |
+|---|---|---|---|
+| psf__requests-1921 (session headers None) | resolved, official | resolved, official | identical |
+| psf__requests-2317 (bytes method) | resolved, official | resolved, official | identical |
+| pytest-dev__pytest-7490 (dynamic xfail) | fix verified by local fail to pass repro A/B | same patch | identical |
+| pytest-dev__pytest-7571 (caplog level leak) | fix verified by local fail to pass repro A/B | same patch | identical |
+
+Official reports: `runs/official-reports/swe-4-sol-loop.json` and `swe-4-baseline.json`. Sol planner cost held at 9 to 13 units per SPEC. The pytest pair cannot grade officially on Apple Silicon: the hub has no arm64 instance images for them and x86_64 pulls resolve arm64 under this daemon (documented in the run logs). Their fixes were verified instead by running the issue repros with and without the patch: xfailed vs failed, 2 passed vs leak. Same patches both arms, so one verification covers both.
+
+Reading: on tasks the executor can solve, both arms converge to the same patch. The loop's value here is process, not a different answer: pinned SPEC, allow list scope, evidence trail, and planning at ~9 units flat instead of ~12 plus units implementing directly. The accuracy gap, if any, shows on tasks the executor cannot solve unaided. That is the next slice.

@@ -1,0 +1,5 @@
+{
+  "executor_input": "evals/external/runs/swe-4/pytest-dev__pytest-7490/work/.sol-loop/SPEC.md",
+  "prompt": "agents/muse-executor.md",
+  "check": "official harness grades this task"
+}

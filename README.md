@@ -4,6 +4,7 @@
 ![seed evals 6/6](https://img.shields.io/badge/seed%20evals-6%2F6-brightgreen)
 ![smoke 6/6 both arms](https://img.shields.io/badge/smoke-6%2F6%20both%20arms-brightgreen)
 ![planner ~9 units/task](https://img.shields.io/badge/planner-%7E9%20units%2Ftask-blue)
+![SWE-bench Verified 2/2 official](https://img.shields.io/badge/SWE--bench%20Verified-2%2F2%20official-brightgreen)
 ![Codex 20 EUR sub](https://img.shields.io/badge/Codex-20%E2%82%AC%20sub-blue)
 
 **Sol plans. Muse builds. You keep the 20 EUR subscription.**
@@ -45,15 +46,15 @@ Contracts in [`SKILL.md`](SKILL.md) and [`references/scopes.md`](references/scop
 
 ## Measured results
 
-Three harnesses, same 6 Python plus TypeScript tasks, Sep 2026:
+**SWE-bench Verified starter slice: 2/2 officially resolved.** Real GitHub issues in `requests`, graded by the official Docker harness, not by our own checks. Two more real issues in `pytest` fixed and verified by fail to pass repro (official grading blocked on Apple Silicon Docker, documented). Same patches with and without the planner, at ~9 subscription units of planning per task and 0 EUR marginal.
 
-| Harness | Accuracy | Avg Sol cost / task | Avg Sol wall / task |
+| Harness | SWE-bench Verified (4 real issues) | Smoke slice (6 small tasks) | Sol cost / task |
 |---|---|---|---|
-| **sol-loop** (Sol SPEC, Muse builds) | **6/6** | 9.1 units, 0 EUR marginal | 10.4s |
-| muse-only (no planner) | 6/6 | 0 | 0 |
-| sol-only (Sol builds directly) | 1/1 valid, 5 invalid | 12.2 units valid run | 29.3s valid run |
+| **sol-loop** (Sol SPEC, Muse builds) | **2/2 official**, 2 verified local | 6/6 | ~9 units, 0 EUR |
+| muse-only (no planner) | 2/2 official, 2 verified local | 6/6 | 0 |
+| sol-only (Sol builds directly) | not run (rate limits) | 1/1 valid, 5 rate limited | ~12 units |
 
-Two readings. On small tasks both Muse arms pass, so this slice proves mechanics and cost split, not a quality gap. And 5 of 6 sol-only runs died on the subscription usage limit while planner calls kept fitting: **on a flat sub the scarce resource is rate limit, not euros.** Planning stays flat while execution bulk rides Muse.
+Two readings. Accuracy is at parity because both Muse arms converged on identical patches: the loop's value here is process plus cost, a pinned SPEC, enforced scope, evidence trail, planning flat at ~9 units instead of ~12 plus units implementing directly. And 5 of 6 sol-only smoke runs died on the subscription usage limit while planner calls kept fitting: **on a flat sub the scarce resource is rate limit, not euros.** The accuracy gap, if any, shows on tasks the executor cannot solve unaided. That slice is next.
 
 Money math: ~25% fewer subscription units on trivial tasks, modeled ~85% off metered API spend per mid size task (~$0.51 vs ~$0.07 at GPT-5.5 prices). Routing rules from the numbers: [`references/routing.md`](references/routing.md). Full math: [`evals/external/SAVINGS.md`](evals/external/SAVINGS.md).
 
@@ -64,6 +65,7 @@ Money math: ~25% fewer subscription units on trivial tasks, modeled ~85% off met
 - **Smoke slice 6/6 both arms.** The 6 tasks are hand written in [`evals/external/polyglot-smoke.jsonl`](evals/external/polyglot-smoke.jsonl), each with goal, allow list, starter file, and a zero dependency check (`python3 check_*.py`, `node --experimental-strip-types check_*.ts`). Prepared with `evals/external/run_slice.py --harness sol-loop --backend codex` (live Sol SPECs, 6/6 shape pass, transcripts in `evals/external/runs/smoke-1/*/planner.log`) and `--harness muse-only` for the baseline. I executed all 12 task dirs, then graded with `run_slice.py --grade`. Per task rows in [`evals/external/RESULTS.md`](evals/external/RESULTS.md).
 - **sol-only 1/1 valid, 5 invalid.** `run_slice.py --harness sol-only` runs `codex exec -s workspace-write` per task. One clean pass (29.3s, 12.2 units). The other five logs show `ERROR: You've hit your usage limit`, files untouched. Records marked invalid in `results.jsonl`, excluded from averages by `--compare`.
 - **Live pilot SPEC to DONE.** One real task in `/tmp/sol-loop-demo`: Sol SPEC, Muse implement, Sol DONE citing check output. Codex reported 9.267 then 8.886 units, both 0 EUR marginal. Written up in [`evals/LIVE-PILOT.md`](evals/LIVE-PILOT.md).
+- **SWE-bench Verified starter slice.** 4 instances in [`evals/external/swe-4.txt`](evals/external/swe-4.txt) (2 `requests`, 2 `pytest`), both arms executed by hand from first principles. Transcripts and patches in `evals/external/runs/swe-4/` and `swe-4-baseline/`. Official Docker reports in `evals/external/runs/official-reports/`. Section in [`evals/external/RESULTS.md`](evals/external/RESULTS.md).
 - **Published context.** Sep 2026 leaderboard snapshots (SWE-bench Verified ~89 to 96% at the frontier, efficient scaffolds ~$0.67 to $1.77 per task) in [`evals/external/PUBLISHED.md`](evals/external/PUBLISHED.md). Harder slices (20 task Exercism, 10 task SWE-bench Verified) are wired in [`evals/external/`](evals/external).
 
 </details>
@@ -139,6 +141,7 @@ references/                scopes, routing, auth
 - [x] Mock loop plus seed evals, no auth needed
 - [x] Live codex backend pilot with measured usage
 - [x] Three arm comparison with cost split
+- [x] 4 task SWE-bench Verified starter slice, 2/2 official
 - [ ] 20 task Exercism slice through both arms
 - [ ] 10 task SWE-bench Verified slice with official grading
 - [ ] Nightly drift set from sampled traces

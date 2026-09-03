@@ -1,0 +1,10 @@
+{
+  "id": "pytest-dev__pytest-7490",
+  "harness": "sol-loop",
+  "backend": "codex",
+  "planner_wall_s": 12.8,
+  "sol_units": "13.334",
+  "spec_shape": "pass",
+  "status": "fix-applied",
+  "official": "fix-verified-local-AB-official-pending-arm64"
+}

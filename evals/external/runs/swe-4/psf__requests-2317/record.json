@@ -1,0 +1,10 @@
+{
+  "id": "psf__requests-2317",
+  "harness": "sol-loop",
+  "backend": "codex",
+  "planner_wall_s": 13.6,
+  "sol_units": "9.635",
+  "spec_shape": "pass",
+  "status": "graded",
+  "official": "resolved-official"
+}

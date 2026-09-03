@@ -1,0 +1,10 @@
+{
+  "id": "pytest-dev__pytest-7490",
+  "harness": "muse-only",
+  "backend": "n/a",
+  "planner_wall_s": 0,
+  "sol_units": "n/a",
+  "spec_shape": "n/a",
+  "status": "fix-applied",
+  "official": "fix-verified-local-AB-official-pending-arm64"
+}
