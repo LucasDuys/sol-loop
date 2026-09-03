@@ -29,7 +29,7 @@ Three arms, same 6 py plus ts tasks, Sep 2026:
 | muse-only (no planner) | 6/6 | 0 | 0 |
 | sol-only (Sol builds directly) | 1/1 valid, 5 invalid | 12.2 units valid run | 29.3s valid run |
 
-Two readings. On small tasks both Muse arms pass, so the slice proves mechanics and cost split, not a quality gap. And 5 of 6 sol-only runs died on the subscription usage limit while planner calls kept fitting: on a flat sub the scarce resource is rate limit, not euros, and planning cost stays flat while execution bulk rides Muse. Routing rules from the numbers: `references/routing.md`. Harder slices (20 task Exercism, 10 task SWE-bench Verified) are wired in `evals/external/`. For context, published Sep 2026 numbers run ~89 to 96% on SWE-bench Verified at the frontier and ~$0.67 to $1.77 per task for efficient scaffolds. Full tables in `evals/BENCHMARKS.md`.
+Two readings. On small tasks both Muse arms pass, so the slice proves mechanics and cost split, not a quality gap. And 5 of 6 sol-only runs died on the subscription usage limit while planner calls kept fitting: on a flat sub the scarce resource is rate limit, not euros, and planning cost stays flat while execution bulk rides Muse. Money math: ~25% fewer subscription units on trivial tasks, modeled ~85% off metered API spend per mid size task (~$0.51 vs ~$0.07 at GPT-5.5 prices). Full math in `evals/external/SAVINGS.md`. Routing rules from the numbers: `references/routing.md`. Harder slices (20 task Exercism, 10 task SWE-bench Verified) are wired in `evals/external/`. For context, published Sep 2026 numbers run ~89 to 96% on SWE-bench Verified at the frontier and ~$0.67 to $1.77 per task for efficient scaffolds. Full tables in `evals/BENCHMARKS.md`.
 
 ## Why this exists
 

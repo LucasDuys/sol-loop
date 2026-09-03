@@ -69,7 +69,8 @@ def main():
     else:
         md.append("| codex live | measured | measured | 0 marginal on 20 EUR sub |")
     md.append("")
-    for extra in ["evals/LIVE-PILOT.md", "evals/external/PUBLISHED.md", "evals/external/RESULTS.md"]:
+    for extra in ["evals/LIVE-PILOT.md", "evals/external/PUBLISHED.md", "evals/external/RESULTS.md",
+                  "evals/external/SAVINGS.md", "evals/external/LANDSCAPE.md"]:
         p = ROOT / extra
         if p.exists():
             md.append("")
