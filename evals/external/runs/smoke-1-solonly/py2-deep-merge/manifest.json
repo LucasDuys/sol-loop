@@ -1,0 +1,5 @@
+{
+  "executor_input": "sol-only, see sol-only.log",
+  "prompt": "codex implemented directly",
+  "check": "python3 check_merge.py"
+}

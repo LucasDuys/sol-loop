@@ -1,0 +1,12 @@
+{
+  "id": "py1-slugify",
+  "harness": "sol-only",
+  "backend": "codex",
+  "planner_wall_s": 29.3,
+  "sol_units": "12.208",
+  "spec_shape": "n/a",
+  "status": "graded",
+  "pass": true,
+  "check_detail": "py1 OK",
+  "note": "clean run"
+}

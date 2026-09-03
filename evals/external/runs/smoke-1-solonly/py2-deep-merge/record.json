@@ -1,0 +1,12 @@
+{
+  "id": "py2-deep-merge",
+  "harness": "sol-only",
+  "backend": "codex",
+  "planner_wall_s": 11.5,
+  "sol_units": "9.054",
+  "spec_shape": "n/a",
+  "status": "graded",
+  "pass": false,
+  "check_detail": "  File \"/Users/lucasduys/dev/sol-loop/evals/external/runs/smoke-1-solonly/py2-deep-merge/work/merge.py\", line 2, in deep_merge |     raise NotImplementedError | NotImplementedError",
+  "note": "rate-limited mid run, invalid"
+}

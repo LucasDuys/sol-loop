@@ -1,0 +1,12 @@
+{
+  "id": "ts1-slugify",
+  "harness": "sol-only",
+  "backend": "codex",
+  "planner_wall_s": 3.4,
+  "sol_units": "n/a",
+  "spec_shape": "n/a",
+  "status": "graded",
+  "pass": false,
+  "check_detail": "    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) |  | Node.js v24.18.0",
+  "note": "rate-limited, invalid"
+}

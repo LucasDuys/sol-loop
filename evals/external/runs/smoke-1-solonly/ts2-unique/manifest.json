@@ -1,0 +1,5 @@
+{
+  "executor_input": "sol-only, see sol-only.log",
+  "prompt": "codex implemented directly",
+  "check": "node --experimental-strip-types check_unique.ts"
+}

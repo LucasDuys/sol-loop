@@ -30,14 +30,20 @@ python3 evals/external/run_slice.py --tasks evals/external/polyglot-smoke.jsonl 
 python3 evals/external/run_slice.py --tasks evals/external/polyglot-smoke.jsonl --harness muse-only --out evals/external/runs/smoke-1-baseline/
 ```
 
-`sol-loop` harness writes GOAL.md and runs the planner to SPEC. `muse-only` writes BRIEF.md with the raw goal and no SPEC. That pair is the baseline that isolates what the Sol SPEC step adds. Execute each task dir (SPEC or BRIEF), then grade:
+`sol-loop` harness writes GOAL.md and runs the planner to SPEC. `muse-only` writes BRIEF.md with the raw goal and no SPEC. `sol-only` skips Muse entirely: Codex implements the task directly with workspace write. The trio separates planner value (sol-loop vs muse-only) from executor value (sol-loop vs sol-only). Execute each task dir per its manifest, then grade:
 
 ```bash
 python3 evals/external/run_slice.py --grade evals/external/runs/smoke-1/
 python3 evals/external/run_slice.py --grade evals/external/runs/smoke-1-baseline/
 ```
 
-Grading runs each task check and appends the comparison table to `evals/external/RESULTS.md`. Recorded per task: pass, planner wall seconds, Sol subscription units, executor notes (Muse tokens are recorded by hand in this environment).
+Grading runs each task check and appends the per run table to `evals/external/RESULTS.md`. Compare arms head to head:
+
+```bash
+python3 evals/external/run_slice.py --compare evals/external/runs/smoke-1 evals/external/runs/smoke-1-baseline evals/external/runs/smoke-1-solonly
+```
+
+The comparison reports accuracy, avg Sol wall seconds, avg Sol units, and Sol side throughput in tasks per hour. Recorded per task: pass, planner wall seconds, Sol subscription units, executor notes (Muse tokens are recorded by hand in this environment). Routing guidance from the numbers lives in `references/routing.md`.
 
 ## SWE-bench Verified 10-slice (heavy path)
 

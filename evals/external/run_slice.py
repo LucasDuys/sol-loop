@@ -58,6 +58,27 @@ def prepare_task(task: dict, out_dir: pathlib.Path, harness: str, backend: str) 
         (tdir / "manifest.json").write_text(json.dumps(
             {"executor_input": str(spec) if spec.exists() else "planner failed, see planner.log",
              "prompt": "agents/muse-executor.md", "check": task.get("check", "")}, indent=2))
+    elif harness == "sol-only":
+        import os as _os
+        prompt = ("Implement this task directly in the working directory. "
+                  f"Goal: {task['goal']} Allowed files: {', '.join(task.get('allow', ['*']))}. "
+                  f"When done, run this check and fix failures until it passes: {task.get('check', '')} "
+                  "Change nothing outside the allowed files.")
+        t0 = time.time()
+        log = tdir / "sol-only.log"
+        try:
+            p = subprocess.run(["codex", "exec", "--skip-git-repo-check", "-s", "workspace-write",
+                                "-C", str(wdir), prompt],
+                               capture_output=True, text=True, timeout=900, env=dict(_os.environ))
+            log.write_text((p.stdout or "") + "\n" + (p.stderr or ""))
+        except subprocess.TimeoutExpired:
+            log.write_text("TIMEOUT after 900s")
+        rec["planner_wall_s"] = round(time.time() - t0, 1)
+        rec["sol_units"] = parse_sol_units(log.read_text())
+        rec["status"] = "executed, grade directly"
+        (tdir / "manifest.json").write_text(json.dumps(
+            {"executor_input": "sol-only, see sol-only.log",
+             "prompt": "codex implemented directly", "check": task.get("check", "")}, indent=2))
     else:
         (tdir / "BRIEF.md").write_text(
             task["goal"] + "\n\nAllowed files: " + ", ".join(task.get("allow", ["*"])) +
@@ -117,6 +138,9 @@ def update_results_md(run_dir: pathlib.Path, results: list):
 
 def cmd_prepare(args):
     tasks = [json.loads(l) for l in pathlib.Path(args.tasks).read_text().splitlines() if l.strip()]
+    if args.only:
+        keep = set(args.only.split(","))
+        tasks = [t for t in tasks if t["id"] in keep]
     out = pathlib.Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     recs = [prepare_task(t, out, args.harness, args.backend) for t in tasks]
@@ -162,16 +186,61 @@ def cmd_collect(args):
                                   "model_name_or_path": "sol-loop"}))
 
 
+def cmd_compare(dirs: list):
+    import datetime
+    rows = []
+    for d in dirs:
+        d = pathlib.Path(d)
+        res = d / "results.jsonl"
+        if not res.exists():
+            print(f"skip {d}: no results.jsonl, grade it first")
+            continue
+        rr = [json.loads(l) for l in res.read_text().splitlines() if l.strip()]
+        if not rr:
+            continue
+        invalid = [r for r in rr if "invalid" in str(r.get("note", ""))]
+        rr = [r for r in rr if "invalid" not in str(r.get("note", ""))]
+        walls = [r.get("planner_wall_s", 0) for r in rr if isinstance(r.get("planner_wall_s"), (int, float))]
+        units = [float(r["sol_units"]) for r in rr
+                 if isinstance(r.get("sol_units"), str) and re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", r["sol_units"])]
+        acc = f"{sum(1 for r in rr if r.get('pass'))}/{len(rr)}"
+        if invalid:
+            acc += f" ({len(invalid)} invalid: rate limited)"
+        rows.append({"run": d.name, "harness": rr[0].get("harness", "?") if rr else "?",
+                     "acc": acc,
+                     "avg_wall_s": round(sum(walls) / len(walls), 1) if walls else "n/a",
+                     "avg_sol_units": round(sum(units) / len(units), 2) if units else "n/a"})
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+    lines = [f"## Comparison {stamp}", "",
+             "| run (harness) | accuracy | avg Sol wall s | avg Sol units | throughput, tasks per hour |",
+             "|---|---|---|---|---|"]
+    for r in rows:
+        tph = round(3600 / r["avg_wall_s"], 1) if isinstance(r["avg_wall_s"], (int, float)) and r["avg_wall_s"] else "n/a"
+        lines.append(f"| {r['run']} ({r['harness']}) | {r['acc']} | {r['avg_wall_s']} | "
+                     f"{r['avg_sol_units']} | {tph} |")
+    lines += ["",
+              "Wall time covers the Sol side only. Executor time is recorded by hand in this environment. "
+              "Sol units ride the 20 EUR subscription at 0 EUR marginal, so the saving vs Sol-only is rate limit and latency, not euros. "
+              "Euro savings apply against metered API models, see PUBLISHED.md.", ""]
+    md_path = ROOT / "evals" / "external" / "RESULTS.md"
+    md_path.write_text(md_path.read_text().rstrip() + "\n\n" + "\n".join(lines))
+    print("\n".join(lines))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tasks")
     ap.add_argument("--swe-ids")
-    ap.add_argument("--harness", default="sol-loop", choices=["sol-loop", "muse-only"])
+    ap.add_argument("--harness", default="sol-loop", choices=["sol-loop", "muse-only", "sol-only"])
     ap.add_argument("--backend", default="mock", choices=["mock", "codex"])
     ap.add_argument("--out")
+    ap.add_argument("--only")
     ap.add_argument("--grade")
     ap.add_argument("--collect-patches")
+    ap.add_argument("--compare", nargs="*")
     args = ap.parse_args()
+    if args.compare:
+        return cmd_compare(args.compare)
     if args.collect_patches:
         return cmd_collect(args)
     if args.grade:

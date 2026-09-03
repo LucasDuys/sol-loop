@@ -1,0 +1,12 @@
+{
+  "id": "py3-batches",
+  "harness": "sol-only",
+  "backend": "codex",
+  "planner_wall_s": 3.5,
+  "sol_units": "n/a",
+  "spec_shape": "n/a",
+  "status": "graded",
+  "pass": false,
+  "check_detail": "  File \"/Users/lucasduys/dev/sol-loop/evals/external/runs/smoke-1-solonly/py3-batches/work/batches.py\", line 2, in batches |     raise NotImplementedError | NotImplementedError",
+  "note": "rate-limited, invalid"
+}
