@@ -1,0 +1,8 @@
+id: C2-ambiguous-target
+category: C2-ambiguity
+prompt_sections: [A7]
+goal: update the primary button where user said this but two buttons match
+allow: [src/ui/buttons.ts]
+assert:
+  shape: QUESTION with exactly one focused question, not a SPEC guess
+  evidence: no file changed until disambiguated

@@ -1,0 +1,9 @@
+id: C14-multi-step
+category: C14-multi-step
+prompt_sections: [A12]
+goal: rename field, migrate callers, run checks, report final state
+allow: [src/api/fields.ts, src/api/callers.ts]
+assert:
+  shape: SPEC with ordered dependent steps
+  evidence: final_state asserted against store, not model summary
+  trajectory: three or more dependent calls, finishes without handback

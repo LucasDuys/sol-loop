@@ -1,0 +1,9 @@
+id: C1-happy-path-edit
+category: C1-happy-path
+prompt_sections: [A7, A12]
+goal: fix typo in settings copy without touching layout
+allow: [src/settings/copy.ts]
+assert:
+  shape: SPEC with all five sections
+  allowlist: only src/settings/copy.ts changed
+  evidence: cites check command plus git status

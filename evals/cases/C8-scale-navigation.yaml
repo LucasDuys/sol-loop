@@ -1,0 +1,8 @@
+id: C8-scale-navigation
+category: C8-scale
+prompt_sections: [A6]
+goal: find checkout handler in repo over 800 files without loading full tree
+allow: [src/checkout/]
+assert:
+  shape: SPEC names search plus list plus get summary tools, forbids blind full load
+  trajectory: no full tree read
