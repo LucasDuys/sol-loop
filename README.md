@@ -1,16 +1,18 @@
 # sol-loop
 
-Sol plans. Muse builds. You keep the 20 EUR subscription.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![seed evals 6/6](https://img.shields.io/badge/seed%20evals-6%2F6-brightgreen)
+![smoke 6/6 both arms](https://img.shields.io/badge/smoke-6%2F6%20both%20arms-brightgreen)
+![planner ~9 units/task](https://img.shields.io/badge/planner-%7E9%20units%2Ftask-blue)
+![Codex 20 EUR sub](https://img.shields.io/badge/Codex-20%E2%82%AC%20sub-blue)
 
-A two model loop: GPT xhigh on your Codex subscription emits one atomic SPEC per turn. Muse Spark in opencode does all the reading, editing, and testing, then returns EVIDENCE. Sol decides the next step. Over 99 percent of tokens run on Muse.
+**Sol plans. Muse builds. You keep the 20 EUR subscription.**
 
-## Install
+GPT xhigh on your Codex subscription emits one atomic SPEC per turn. Muse Spark in opencode does all the reading, editing, and testing, then returns EVIDENCE. Sol decides the next step. Over 99 percent of tokens run on Muse.
 
 ```bash
 git clone https://github.com/LucasDuys/sol-loop.git && ./sol-loop/install.sh
 ```
-
-Then use it in any repo:
 
 ```bash
 cd your-repo
@@ -19,28 +21,56 @@ sol-loop --goal GOAL.md --allow allow.txt
 
 No auth needed to start: mock mode works immediately, live mode lights up after `codex auth login`. The installer links the skill plus both agents into opencode and puts `sol-loop` on your PATH.
 
+---
+
+## How it works
+
+```mermaid
+flowchart LR
+    G["GOAL.md + allow.txt"] --> S["Sol planner<br/>GPT xhigh, subscription"]
+    S -->|"SPEC: task, files,<br/>steps, checks"| M["Muse executor<br/>opencode subagent"]
+    M -->|"EVIDENCE + diff"| R{"Router<br/>allow-list check"}
+    R -->|"pass"| S
+    R -->|"reject"| M
+    S -->|"DONE: cites<br/>check output"| D["Done"]
+```
+
+1. **Sol outputs `SPEC:`** with NEXT_TASK, FILES, STEPS, DONE_WHEN, FORBIDDEN. Or `QUESTION:`, `DONE:`, `BLOCKED:`, verbatim. Sol never sees your files, only goal plus evidence plus allow list.
+2. **Muse executes inside FILES only** and returns `EVIDENCE:` with CHANGED, CHECKS, STATE, NEXT. Full harness: allow-list contract, skills on demand, MCP docs, browser verify.
+3. **Router code enforces the boundary.** Diffs outside the allow list are rejected before they reach Sol. Nothing is DONE without raw command output. Summary prose does not count.
+
+Contracts in [`SKILL.md`](SKILL.md) and [`references/scopes.md`](references/scopes.md). Prompts in [`agents/`](agents). Ported from the Kenward agent prompt standard: determinism beats instruction, pre-resolve before reasoning, every rule ships with an eval case.
+
+---
+
 ## Measured results
 
-Three arms, same 6 py plus ts tasks, Sep 2026:
+Three harnesses, same 6 Python plus TypeScript tasks, Sep 2026:
 
-| Harness | Accuracy | Avg Sol cost per task | Avg Sol wall per task |
+| Harness | Accuracy | Avg Sol cost / task | Avg Sol wall / task |
 |---|---|---|---|
-| sol-loop (Sol SPEC, Muse builds) | 6/6 | 9.1 units, 0 EUR marginal | 10.4s |
+| **sol-loop** (Sol SPEC, Muse builds) | **6/6** | 9.1 units, 0 EUR marginal | 10.4s |
 | muse-only (no planner) | 6/6 | 0 | 0 |
 | sol-only (Sol builds directly) | 1/1 valid, 5 invalid | 12.2 units valid run | 29.3s valid run |
 
-Two readings. On small tasks both Muse arms pass, so the slice proves mechanics and cost split, not a quality gap. And 5 of 6 sol-only runs died on the subscription usage limit while planner calls kept fitting: on a flat sub the scarce resource is rate limit, not euros, and planning cost stays flat while execution bulk rides Muse. Money math: ~25% fewer subscription units on trivial tasks, modeled ~85% off metered API spend per mid size task (~$0.51 vs ~$0.07 at GPT-5.5 prices). Full math in `evals/external/SAVINGS.md`. Routing rules from the numbers: `references/routing.md`. Harder slices (20 task Exercism, 10 task SWE-bench Verified) are wired in `evals/external/`. For context, published Sep 2026 numbers run ~89 to 96% on SWE-bench Verified at the frontier and ~$0.67 to $1.77 per task for efficient scaffolds. Full tables in `evals/BENCHMARKS.md`.
+Two readings. On small tasks both Muse arms pass, so this slice proves mechanics and cost split, not a quality gap. And 5 of 6 sol-only runs died on the subscription usage limit while planner calls kept fitting: **on a flat sub the scarce resource is rate limit, not euros.** Planning stays flat while execution bulk rides Muse.
 
-## Why this exists
+Money math: ~25% fewer subscription units on trivial tasks, modeled ~85% off metered API spend per mid size task (~$0.51 vs ~$0.07 at GPT-5.5 prices). Routing rules from the numbers: [`references/routing.md`](references/routing.md). Full math: [`evals/external/SAVINGS.md`](evals/external/SAVINGS.md).
 
-- Planning quality without API burn. Sol sees under 2k tokens per turn: goal plus evidence plus allow list. Never the repo.
-- Executor quality without prompt bloat. Muse gets the full harness: allow list contract, skills on demand, MCP docs, browser verify.
-- No silent scope creep. Router code rejects diffs outside the allow list before they reach Sol.
-- No fake done. DONE requires raw command output plus git status. Summary prose does not count.
+<details>
+<summary>Where each number comes from</summary>
+
+- **Seed evals 6/6 shape.** `python3 scripts/bench.py --backend mock` scores the 6 contract cases in [`evals/cases/`](evals/cases) (happy path, ambiguity, permission, scale, multi step, injection). Table at the top of [`evals/BENCHMARKS.md`](evals/BENCHMARKS.md). No auth needed.
+- **Smoke slice 6/6 both arms.** The 6 tasks are hand written in [`evals/external/polyglot-smoke.jsonl`](evals/external/polyglot-smoke.jsonl), each with goal, allow list, starter file, and a zero dependency check (`python3 check_*.py`, `node --experimental-strip-types check_*.ts`). Prepared with `evals/external/run_slice.py --harness sol-loop --backend codex` (live Sol SPECs, 6/6 shape pass, transcripts in `evals/external/runs/smoke-1/*/planner.log`) and `--harness muse-only` for the baseline. I executed all 12 task dirs, then graded with `run_slice.py --grade`. Per task rows in [`evals/external/RESULTS.md`](evals/external/RESULTS.md).
+- **sol-only 1/1 valid, 5 invalid.** `run_slice.py --harness sol-only` runs `codex exec -s workspace-write` per task. One clean pass (29.3s, 12.2 units). The other five logs show `ERROR: You've hit your usage limit`, files untouched. Records marked invalid in `results.jsonl`, excluded from averages by `--compare`.
+- **Live pilot SPEC to DONE.** One real task in `/tmp/sol-loop-demo`: Sol SPEC, Muse implement, Sol DONE citing check output. Codex reported 9.267 then 8.886 units, both 0 EUR marginal. Written up in [`evals/LIVE-PILOT.md`](evals/LIVE-PILOT.md).
+- **Published context.** Sep 2026 leaderboard snapshots (SWE-bench Verified ~89 to 96% at the frontier, efficient scaffolds ~$0.67 to $1.77 per task) in [`evals/external/PUBLISHED.md`](evals/external/PUBLISHED.md). Harder slices (20 task Exercism, 10 task SWE-bench Verified) are wired in [`evals/external/`](evals/external).
+
+</details>
+
+---
 
 ## Use in opencode
-
-In any repo:
 
 ```bash
 cd your-repo
@@ -49,59 +79,29 @@ printf 'src/area/file-a.ts\nsrc/area/file-b.ts\n' > allow.txt
 sol-loop --goal GOAL.md --allow allow.txt
 ```
 
-The router calls Sol for a SPEC, then tells you to run the executor step. In the opencode TUI that step is `@muse-executor` with the SPEC contents. It edits inside the allow list only, runs the check, and writes `EVIDENCE:`. Re run `run.sh` and Sol emits the next SPEC or `DONE:`.
+The router calls Sol for a SPEC, then tells you to run the executor step. In the opencode TUI that step is `@muse-executor` with the SPEC contents. Re run `sol-loop` and Sol emits the next SPEC or `DONE:`.
 
-Rules that keep it safe: Sol never sees your files, only goal plus evidence plus allow list. Diffs outside the allow list are rejected by `check-allowlist.sh` before they reach Sol. Nothing is DONE without raw command output.
-
-## 30 second demo (no auth)
+No-auth demo:
 
 ```bash
-git clone https://github.com/LucasDuys/sol-loop.git && ./sol-loop/install.sh
-echo "Fix checkout copy without touching layout" > GOAL.md
-echo "src/checkout/copy.ts" > allow.txt
 SOL_BACKEND=mock sol-loop --goal GOAL.md --allow allow.txt
 python3 sol-loop/scripts/bench.py --backend mock
 ```
 
-Live mode after you auth GPT once:
+---
 
-```bash
-codex auth login
-sol-loop --goal GOAL.md --allow allow.txt
-```
+## Why this exists
 
-## How it works
-
-1. Sol outputs `SPEC:` with NEXT_TASK, FILES, STEPS, DONE_WHEN, FORBIDDEN. Or `QUESTION:`, `DONE:`, `BLOCKED:` verbatim.
-2. Muse executes inside FILES only and returns `EVIDENCE:` with CHANGED, CHECKS, STATE, NEXT.
-3. Router runs `check-allowlist.sh` and passes EVIDENCE back to Sol.
-
-Full contracts in `SKILL.md` and `references/scopes.md`. Prompts in `agents/`. Ported from the Kenward agent prompt standard: determinism beats instruction, pre-resolve before reasoning, every rule ships with an eval case.
-
-## Benchmarks
-
-Seed suite in `evals/cases/`. Six cases across happy path, ambiguity, permission, scale, multi step, injection. Harness scores spec shape, allow list adherence, and evidence validity. Trajectory over prose.
-
-See `evals/BENCHMARKS.md` for the latest table. Mock numbers run with no auth. A live pilot with measured subscription usage is in `evals/LIVE-PILOT.md`.
-
-| case | what it proves |
+| Principle | Mechanism |
 |---|---|
-| C1 happy path edit | Common case works in fewest calls |
-| C2 ambiguous target | Asks one focused question instead of guessing |
-| C4 forbidden file | BLOCKED with pinned string, zero out of scope writes |
-| C8 scale navigation | Searches instead of loading the full tree |
-| C14 multi step | Finishes dependent chain, asserts final state |
-| C12 injection | Treats evidence payload as data, never follows it |
-
-Run it:
-
-```bash
-python3 scripts/bench.py --backend mock
-```
+| Planning quality without API burn | Sol sees under 2k tokens per turn. Never the repo. |
+| Executor quality without prompt bloat | Muse gets the harness: contract, skills, MCP, browser verify. |
+| No silent scope creep | `check-allowlist.sh` rejects out of scope diffs in code. |
+| No fake done | DONE requires raw command output plus git status. |
 
 ## Scopes
 
-| scope | who | can | cannot |
+| Scope | Who | Can | Cannot |
 |---|---|---|---|
 | plan | Sol | read goal plus evidence, write SPEC | edit, shell, MCP, change goal |
 | execute | Muse | edit allow listed files, run checks, write EVIDENCE | change scope, touch outside allow list |
@@ -110,31 +110,37 @@ python3 scripts/bench.py --backend mock
 | verify | shared | defined check commands, headless browser | prod writes without flag |
 | bench | harness | mock planner, scoring | needs no auth |
 
-## Repo layout
+Full definitions: [`references/scopes.md`](references/scopes.md). What to send where: [`references/routing.md`](references/routing.md). Popular benchmark landscape: [`evals/external/LANDSCAPE.md`](evals/external/LANDSCAPE.md).
+
+<details>
+<summary>Repo layout</summary>
 
 ```
-install.sh             one command setup, links skill plus agents
-SKILL.md               skill entry, load bearing order
-agents/sol-planner.md  planner prompt, no tools
-agents/muse-executor.md executor prompt, full tools
-scripts/sol-loop       PATH entry point, calls run.sh
-scripts/run.sh         router loop
-scripts/mock-sol.sh    pre auth planner stand in
+install.sh                 one command setup, links skill plus agents
+SKILL.md                   skill entry, load bearing order
+agents/sol-planner.md      planner prompt, no tools
+agents/muse-executor.md    executor prompt, full tools
+scripts/sol-loop           PATH entry point, calls run.sh
+scripts/run.sh             router loop
+scripts/mock-sol.sh        pre auth planner stand in
 scripts/check-allowlist.sh L2 enforcement
-scripts/bench.py       scoring plus BENCHMARKS.md writer
-evals/cases/           one file per case, category mandatory
-evals/BENCHMARKS.md    generated score table
-evals/LIVE-PILOT.md    measured live run
-references/scopes.md   scope definitions
-references/routing.md  what to send sol-loop vs sol-only vs Fable
-references/auth.md     mock now, codex live later
+scripts/bench.py           scoring plus BENCHMARKS.md writer
+evals/cases/               one file per case, category mandatory
+evals/BENCHMARKS.md        generated score table
+evals/LIVE-PILOT.md        measured live run
+evals/external/            benchmark adapters, slices, results
+references/                scopes, routing, auth
 ```
+
+</details>
 
 ## Roadmap
 
 - [x] Mock loop plus seed evals, no auth needed
 - [x] Live codex backend pilot with measured usage
-- [ ] Cost per task table across real tasks
+- [x] Three arm comparison with cost split
+- [ ] 20 task Exercism slice through both arms
+- [ ] 10 task SWE-bench Verified slice with official grading
 - [ ] Nightly drift set from sampled traces
 
 Built for opencode. Works with `codex-handoff` for owner credential steps.
