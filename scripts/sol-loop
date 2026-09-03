@@ -1,0 +1,25 @@
+#!/bin/zsh
+# sol-loop entry point. Installed to ~/.local/bin by install.sh.
+# Usage: sol-loop --goal GOAL.md --allow allow.txt [--workdir .]
+set -euo pipefail
+
+SRC="$0"
+while [[ -L "$SRC" ]]; do
+  LINK="$(readlink "$SRC")"
+  case "$LINK" in
+    /*) SRC="$LINK";;
+    *) SRC="$(dirname "$SRC")/$LINK";;
+  esac
+done
+ROOT="$(cd "$(dirname "$SRC")/.." && pwd)"
+
+if [[ -z "${SOL_BACKEND:-}" ]]; then
+  if command -v codex >/dev/null 2>&1; then
+    SOL_BACKEND=codex
+  else
+    SOL_BACKEND=mock
+  fi
+  export SOL_BACKEND
+fi
+
+exec zsh "$ROOT/scripts/run.sh" "$@"

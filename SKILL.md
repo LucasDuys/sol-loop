@@ -41,6 +41,6 @@ Evidence rule: no DONE without raw command output plus `git status --short`. A s
 
 ## Entry points
 
-- `scripts/run.sh --goal GOAL.md --allow allow.txt` runs the loop.
+- `sol-loop --goal GOAL.md --allow allow.txt` runs the loop (`scripts/run.sh` underneath).
 - `scripts/bench.py --backend mock` scores the seed cases and rewrites `evals/BENCHMARKS.md`.
 - `evals/cases/` holds one file per case. Category is mandatory.

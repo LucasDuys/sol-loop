@@ -4,21 +4,38 @@ Sol plans. Muse builds. You keep the 20 EUR subscription.
 
 A two model loop: GPT xhigh on your Codex subscription emits one atomic SPEC per turn. Muse Spark in opencode does all the reading, editing, and testing, then returns EVIDENCE. Sol decides the next step. Over 99 percent of tokens run on Muse.
 
+## Install
+
+```bash
+git clone https://github.com/LucasDuys/sol-loop.git && ./sol-loop/install.sh
+```
+
+Then use it in any repo:
+
+```bash
+cd your-repo
+sol-loop --goal GOAL.md --allow allow.txt
+```
+
+No auth needed to start: mock mode works immediately, live mode lights up after `codex auth login`. The installer links the skill plus both agents into opencode and puts `sol-loop` on your PATH.
+
+## Measured results
+
+| Run | Quality | Cost | Speed |
+|---|---|---|---|
+| Live pilot, 1 task SPEC to DONE | done, check output cited | 2 Sol turns on subscription at 0 EUR marginal | planner ~10s per turn |
+| Smoke slice, 6 py plus ts tasks, sol-loop arm | 6/6 pass, 6/6 SPEC shape | avg 9.1 Sol units per task, 0 EUR marginal | avg 10.4s planner per task |
+| Smoke slice, same 6 tasks, muse-only baseline | 6/6 pass | 0 planner cost | no planning step |
+| Seed evals, prompt contract | 6/6 shape pass | 0, template planner | instant |
+
+Honest framing: the smoke tasks are small, so both arms pass. They prove the loop mechanics and the cost split, not a quality gap. The gap is expected on harder work: a 20 task Exercism slice and a 10 task SWE-bench Verified slice are wired and ready in `evals/external/`. For context, published Sep 2026 numbers run ~89 to 96% on SWE-bench Verified at the frontier and ~$0.67 to $1.77 per task for efficient scaffolds. Full tables in `evals/BENCHMARKS.md`.
+
 ## Why this exists
 
 - Planning quality without API burn. Sol sees under 2k tokens per turn: goal plus evidence plus allow list. Never the repo.
 - Executor quality without prompt bloat. Muse gets the full harness: allow list contract, skills on demand, MCP docs, browser verify.
 - No silent scope creep. Router code rejects diffs outside the allow list before they reach Sol.
 - No fake done. DONE requires raw command output plus git status. Summary prose does not count.
-
-## Install (one command)
-
-```bash
-git clone https://github.com/LucasDuys/sol-loop.git
-./sol-loop/install.sh
-```
-
-That links the skill plus both agents into opencode, probes Codex auth, and runs the seed evals. No auth needed to start: mock mode works immediately, live mode lights up after `codex auth login`.
 
 ## Use in opencode
 
@@ -28,7 +45,7 @@ In any repo:
 cd your-repo
 echo "Your goal in one paragraph" > GOAL.md
 printf 'src/area/file-a.ts\nsrc/area/file-b.ts\n' > allow.txt
-SOL_BACKEND=codex /path/to/sol-loop/scripts/run.sh --goal GOAL.md --allow allow.txt
+sol-loop --goal GOAL.md --allow allow.txt
 ```
 
 The router calls Sol for a SPEC, then tells you to run the executor step. In the opencode TUI that step is `@muse-executor` with the SPEC contents. It edits inside the allow list only, runs the check, and writes `EVIDENCE:`. Re run `run.sh` and Sol emits the next SPEC or `DONE:`.
@@ -38,10 +55,10 @@ Rules that keep it safe: Sol never sees your files, only goal plus evidence plus
 ## 30 second demo (no auth)
 
 ```bash
-git clone https://github.com/LucasDuys/sol-loop.git
+git clone https://github.com/LucasDuys/sol-loop.git && ./sol-loop/install.sh
 echo "Fix checkout copy without touching layout" > GOAL.md
 echo "src/checkout/copy.ts" > allow.txt
-SOL_BACKEND=mock sol-loop/scripts/run.sh --goal GOAL.md --allow allow.txt
+SOL_BACKEND=mock sol-loop --goal GOAL.md --allow allow.txt
 python3 sol-loop/scripts/bench.py --backend mock
 ```
 
@@ -49,7 +66,7 @@ Live mode after you auth GPT once:
 
 ```bash
 codex auth login
-SOL_BACKEND=codex scripts/run.sh --goal GOAL.md --allow allow.txt
+sol-loop --goal GOAL.md --allow allow.txt
 ```
 
 ## How it works
@@ -99,6 +116,7 @@ install.sh             one command setup, links skill plus agents
 SKILL.md               skill entry, load bearing order
 agents/sol-planner.md  planner prompt, no tools
 agents/muse-executor.md executor prompt, full tools
+scripts/sol-loop       PATH entry point, calls run.sh
 scripts/run.sh         router loop
 scripts/mock-sol.sh    pre auth planner stand in
 scripts/check-allowlist.sh L2 enforcement
