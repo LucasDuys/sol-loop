@@ -1,0 +1,4 @@
+# SWE 10-slice starter list (DRAFT, IDs not yet verified against the dataset).
+# Verify with: python3 -c "from datasets import load_dataset; ds={r['instance_id'] for r in load_dataset('princeton-nlp/SWE-bench_Verified', split='test')}; print([l.strip() for l in open('swe-10.txt') if l.strip() and not l.startswith('#')] <= ds)"
+# Aim: 10 instances across at least 4 of the 12 repos, mixed difficulty.
+# Fill in after installing datasets, then run run_slice.py --swe-ids.

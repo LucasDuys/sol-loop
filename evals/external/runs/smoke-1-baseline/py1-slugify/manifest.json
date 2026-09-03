@@ -1,0 +1,5 @@
+{
+  "executor_input": "evals/external/runs/smoke-1-baseline/py1-slugify/BRIEF.md",
+  "prompt": "implement directly, no SPEC",
+  "check": "python3 check_slug.py"
+}

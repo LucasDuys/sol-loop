@@ -69,11 +69,12 @@ def main():
     else:
         md.append("| codex live | measured | measured | 0 marginal on 20 EUR sub |")
     md.append("")
-    pilot = ROOT / "evals" / "LIVE-PILOT.md"
-    if pilot.exists():
-        md.append("")
-        md.append(pilot.read_text().rstrip())
-        md.append("")
+    for extra in ["evals/LIVE-PILOT.md", "evals/external/PUBLISHED.md", "evals/external/RESULTS.md"]:
+        p = ROOT / extra
+        if p.exists():
+            md.append("")
+            md.append(p.read_text().rstrip())
+            md.append("")
     (ROOT / "evals" / "BENCHMARKS.md").write_text("\n".join(md))
     print(json.dumps({"backend": args.backend, "passed": passed, "total": total}, indent=2))
 

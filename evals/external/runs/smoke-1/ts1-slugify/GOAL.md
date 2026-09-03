@@ -1,0 +1,1 @@
+Add an exported slugify function to slug.ts that lowercases, replaces any run of non alphanumeric characters with a single hyphen, and strips leading and trailing hyphens. Do not change check_slug.ts.

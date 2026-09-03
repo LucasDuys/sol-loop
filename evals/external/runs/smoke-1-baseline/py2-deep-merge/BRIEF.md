@@ -1,0 +1,4 @@
+Add a deep_merge(a, b) function to merge.py that recursively merges dict b into dict a and returns a new dict. Lists and scalars from b replace those in a. Neither input may be mutated. Do not change check_merge.py.
+
+Allowed files: merge.py
+Check: python3 check_merge.py

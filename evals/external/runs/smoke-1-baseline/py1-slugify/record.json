@@ -1,0 +1,11 @@
+{
+  "id": "py1-slugify",
+  "harness": "muse-only",
+  "backend": "mock",
+  "planner_wall_s": 0,
+  "sol_units": "n/a",
+  "spec_shape": "n/a",
+  "status": "graded",
+  "pass": true,
+  "check_detail": "py1 OK"
+}

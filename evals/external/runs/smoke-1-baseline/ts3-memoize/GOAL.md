@@ -1,0 +1,1 @@
+Add an exported memoize function to memoize.ts that wraps a pure single argument function and caches results by argument. The wrapped function must be called at most once per distinct argument. Do not change check_memoize.ts.

@@ -1,0 +1,11 @@
+{
+  "id": "py2-deep-merge",
+  "harness": "sol-loop",
+  "backend": "codex",
+  "planner_wall_s": 12.4,
+  "sol_units": "9.184",
+  "spec_shape": "pass",
+  "status": "graded",
+  "pass": true,
+  "check_detail": "py2 OK"
+}

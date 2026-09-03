@@ -1,0 +1,11 @@
+{
+  "id": "py3-batches",
+  "harness": "sol-loop",
+  "backend": "codex",
+  "planner_wall_s": 7.6,
+  "sol_units": "8.942",
+  "spec_shape": "pass",
+  "status": "graded",
+  "pass": true,
+  "check_detail": "py3 OK"
+}

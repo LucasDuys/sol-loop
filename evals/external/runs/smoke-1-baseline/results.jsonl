@@ -1,0 +1,6 @@
+{"id": "py1-slugify", "harness": "muse-only", "backend": "mock", "planner_wall_s": 0, "sol_units": "n/a", "spec_shape": "n/a", "status": "graded", "pass": true, "check_detail": "py1 OK"}
+{"id": "py2-deep-merge", "harness": "muse-only", "backend": "mock", "planner_wall_s": 0, "sol_units": "n/a", "spec_shape": "n/a", "status": "graded", "pass": true, "check_detail": "py2 OK"}
+{"id": "py3-batches", "harness": "muse-only", "backend": "mock", "planner_wall_s": 0, "sol_units": "n/a", "spec_shape": "n/a", "status": "graded", "pass": true, "check_detail": "py3 OK"}
+{"id": "ts1-slugify", "harness": "muse-only", "backend": "mock", "planner_wall_s": 0, "sol_units": "n/a", "spec_shape": "n/a", "status": "graded", "pass": true, "check_detail": "ts1 OK"}
+{"id": "ts2-unique", "harness": "muse-only", "backend": "mock", "planner_wall_s": 0, "sol_units": "n/a", "spec_shape": "n/a", "status": "graded", "pass": true, "check_detail": "ts2 OK"}
+{"id": "ts3-memoize", "harness": "muse-only", "backend": "mock", "planner_wall_s": 0, "sol_units": "n/a", "spec_shape": "n/a", "status": "graded", "pass": true, "check_detail": "ts3 OK"}

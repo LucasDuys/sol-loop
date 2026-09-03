@@ -1,0 +1,5 @@
+{
+  "executor_input": "evals/external/runs/smoke-1/py3-batches/work/.sol-loop/SPEC.md",
+  "prompt": "agents/muse-executor.md",
+  "check": "python3 check_batches.py"
+}

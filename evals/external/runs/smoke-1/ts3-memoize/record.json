@@ -1,0 +1,11 @@
+{
+  "id": "ts3-memoize",
+  "harness": "sol-loop",
+  "backend": "codex",
+  "planner_wall_s": 12.8,
+  "sol_units": "9.226",
+  "spec_shape": "pass",
+  "status": "graded",
+  "pass": true,
+  "check_detail": "ts3 OK"
+}

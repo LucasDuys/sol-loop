@@ -1,0 +1,11 @@
+{
+  "id": "ts2-unique",
+  "harness": "sol-loop",
+  "backend": "codex",
+  "planner_wall_s": 9.8,
+  "sol_units": "9.060",
+  "spec_shape": "pass",
+  "status": "graded",
+  "pass": true,
+  "check_detail": "ts2 OK"
+}

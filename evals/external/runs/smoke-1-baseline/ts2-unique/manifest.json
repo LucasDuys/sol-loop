@@ -1,0 +1,5 @@
+{
+  "executor_input": "evals/external/runs/smoke-1-baseline/ts2-unique/BRIEF.md",
+  "prompt": "implement directly, no SPEC",
+  "check": "node --experimental-strip-types check_unique.ts"
+}

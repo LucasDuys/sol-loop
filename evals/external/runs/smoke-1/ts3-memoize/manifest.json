@@ -1,0 +1,5 @@
+{
+  "executor_input": "evals/external/runs/smoke-1/ts3-memoize/work/.sol-loop/SPEC.md",
+  "prompt": "agents/muse-executor.md",
+  "check": "node --experimental-strip-types check_memoize.ts"
+}
